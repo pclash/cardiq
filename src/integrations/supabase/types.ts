@@ -14,7 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_insights_cache: {
+        Row: {
+          card_id: string
+          generated_at: string
+          id: string
+          insights: Json
+        }
+        Insert: {
+          card_id: string
+          generated_at?: string
+          id?: string
+          insights: Json
+        }
+        Update: {
+          card_id?: string
+          generated_at?: string
+          id?: string
+          insights?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_cache_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: true
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cards: {
+        Row: {
+          annual_fee: number
+          bank: string
+          best_for: string | null
+          created_at: string
+          eligibility: Json
+          excluded_categories: string[]
+          fee_waiver_spend: number | null
+          id: string
+          joining_fee: number
+          key_benefits: string[]
+          name: string
+          network: string
+          official_url: string | null
+          popularity_rank: number
+          reward_rate: string | null
+          slug: string
+          tagline: string | null
+          use_cases: string[]
+          welcome_benefit: string | null
+        }
+        Insert: {
+          annual_fee?: number
+          bank: string
+          best_for?: string | null
+          created_at?: string
+          eligibility?: Json
+          excluded_categories?: string[]
+          fee_waiver_spend?: number | null
+          id?: string
+          joining_fee?: number
+          key_benefits?: string[]
+          name: string
+          network: string
+          official_url?: string | null
+          popularity_rank?: number
+          reward_rate?: string | null
+          slug: string
+          tagline?: string | null
+          use_cases?: string[]
+          welcome_benefit?: string | null
+        }
+        Update: {
+          annual_fee?: number
+          bank?: string
+          best_for?: string | null
+          created_at?: string
+          eligibility?: Json
+          excluded_categories?: string[]
+          fee_waiver_spend?: number | null
+          id?: string
+          joining_fee?: number
+          key_benefits?: string[]
+          name?: string
+          network?: string
+          official_url?: string | null
+          popularity_rank?: number
+          reward_rate?: string | null
+          slug?: string
+          tagline?: string | null
+          use_cases?: string[]
+          welcome_benefit?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
