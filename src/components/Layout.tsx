@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { CreditCard } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -15,13 +15,13 @@ export default function Layout() {
   );
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg gradient-card flex items-center justify-center">
-              <CreditCard className="h-4 w-4 text-white" />
+            <div className="h-8 w-8 rounded-lg gradient-card flex items-center justify-center shadow-card">
+              <Sparkles className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-lg">CardCompass <span className="text-primary">India</span></span>
+            <span className="font-bold text-lg tracking-tight">Swipe<span className="text-primary">Sutra</span></span>
           </Link>
           <nav className="flex items-center gap-6">
             {navLink("/", "Browse")}
@@ -31,16 +31,16 @@ export default function Layout() {
         </div>
       </header>
       <main className="flex-1"><Outlet /></main>
-      <footer className="border-t mt-12">
+      <footer className="border-t mt-12 bg-secondary/30">
         <div className="container py-8 text-sm text-muted-foreground space-y-2">
-          <p className="font-medium text-foreground">Disclaimer</p>
+          <p className="font-semibold text-foreground">SwipeSutra · the art of using cards in India</p>
           <p>
-            CardCompass India is an independent informational tool. Card details and AI-generated
-            insights are for guidance only and may be outdated. Always verify fees, benefits and
-            eligibility on the official issuing bank's website before applying.
+            SwipeSutra is an independent, non-affiliated guide. Card details and AI-generated insights
+            are for guidance only and may be outdated. Always verify fees, benefits and eligibility on
+            the official issuing bank's website before applying.
           </p>
           <p>No affiliate links · No personal data collected · Not financial advice.</p>
-          <p className="pt-2">© {new Date().getFullYear()} CardCompass India</p>
+          <p className="pt-2">© {new Date().getFullYear()} SwipeSutra</p>
         </div>
       </footer>
     </div>
