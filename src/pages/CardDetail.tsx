@@ -15,6 +15,8 @@ export default function CardDetail() {
   const [loading, setLoading] = useState(true);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(false);
+  const [stories, setStories] = useState<Stories | null>(null);
+  const [loadingStories, setLoadingStories] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -22,7 +24,10 @@ export default function CardDetail() {
     supabase.from("cards").select("*").eq("slug", slug).maybeSingle().then(({ data }) => {
       setCard((data ?? null) as CardT | null);
       setLoading(false);
-      if (data) loadInsights(data.id);
+      if (data) {
+        loadInsights(data.id);
+        loadStories(data.id);
+      }
     });
   }, [slug]);
 
@@ -32,16 +37,24 @@ export default function CardDetail() {
     try {
       const { data, error } = await supabase.functions.invoke("generate-insights", { body: { card_id } });
       if (error) throw error;
-      if (data?.error) {
-        toast.error(data.error);
-        return;
-      }
+      if (data?.error) { toast.error(data.error); return; }
       setInsights(data.insights);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to load insights");
     } finally {
       setLoadingInsights(false);
     }
+  }
+
+  async function loadStories(card_id: string) {
+    setLoadingStories(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-stories", { body: { card_id } });
+      if (error) throw error;
+      if (data?.error) return;
+      setStories(data.stories);
+    } catch { /* silent */ }
+    finally { setLoadingStories(false); }
   }
 
   if (loading) return <div className="container py-16 text-muted-foreground">Loading…</div>;
