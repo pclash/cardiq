@@ -59,22 +59,24 @@ export default function Browse() {
 
   return (
     <>
-      <section className="gradient-hero text-white">
-        <div className="container py-16 md:py-20">
+      <section className="gradient-hero text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, white 1px, transparent 1px), radial-gradient(circle at 80% 70%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+        <div className="container py-16 md:py-24 relative">
           <Badge className="bg-white/20 text-white hover:bg-white/30 border-0 mb-4">
-            <Sparkles className="w-3 h-3 mr-1" /> AI-powered insights
+            <Sparkles className="w-3 h-3 mr-1" /> Powered by Google Gemini
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold max-w-3xl">
-            Find the right Indian credit card — without the marketing fluff.
+          <h1 className="text-4xl md:text-6xl font-bold max-w-3xl tracking-tight">
+            The art of using <span className="text-accent">Indian credit cards</span>.
           </h1>
-          <p className="mt-4 text-lg text-white/85 max-w-2xl">
-            {cards.length}+ cards, filtered by bank, use case and eligibility. With honest "where it doesn't work" sections you won't find on bank sites.
+          <p className="mt-5 text-lg text-white/85 max-w-2xl">
+            {cards.length}+ cards from lifetime-free to ultra-luxury metal. Honest insights, real use cases,
+            "where it doesn't work" truths, and a Hall of Hacks you won't find on bank sites.
           </p>
-          <div className="mt-6 max-w-xl relative">
+          <div className="mt-7 max-w-xl relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by card, bank, or use case (e.g. travel, fuel)..."
-              className="pl-10 h-12 bg-white text-foreground border-0" />
+              placeholder="Search by card, bank, or use case (travel, fuel, lounge…)"
+              className="pl-10 h-12 bg-white text-foreground border-0 shadow-elevated" />
           </div>
         </div>
       </section>
