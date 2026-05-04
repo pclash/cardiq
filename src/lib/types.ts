@@ -26,3 +26,6 @@ export type Insights = {
   community_sentiment?: string;
   alternatives?: { slug: string; name: string; why: string }[];
 };
+
+export type Story = { title: string; story: string; vibe: "smart" | "wild" | "wholesome" | "savage" };
+export type Stories = { stories: Story[] };

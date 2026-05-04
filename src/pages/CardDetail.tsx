@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import type { Card as CardT, Insights } from "@/lib/types";
+import type { Card as CardT, Insights, Stories } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CardThumb from "@/components/CardThumb";
-import { ArrowLeft, ExternalLink, Sparkles, CheckCircle2, XCircle, AlertTriangle, Users } from "lucide-react";
+import { ArrowLeft, ExternalLink, Sparkles, CheckCircle2, XCircle, AlertTriangle, Users, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CardDetail() {
@@ -15,6 +15,8 @@ export default function CardDetail() {
   const [loading, setLoading] = useState(true);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(false);
+  const [stories, setStories] = useState<Stories | null>(null);
+  const [loadingStories, setLoadingStories] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -22,7 +24,10 @@ export default function CardDetail() {
     supabase.from("cards").select("*").eq("slug", slug).maybeSingle().then(({ data }) => {
       setCard((data ?? null) as CardT | null);
       setLoading(false);
-      if (data) loadInsights(data.id);
+      if (data) {
+        loadInsights(data.id);
+        loadStories(data.id);
+      }
     });
   }, [slug]);
 
@@ -32,16 +37,24 @@ export default function CardDetail() {
     try {
       const { data, error } = await supabase.functions.invoke("generate-insights", { body: { card_id } });
       if (error) throw error;
-      if (data?.error) {
-        toast.error(data.error);
-        return;
-      }
+      if (data?.error) { toast.error(data.error); return; }
       setInsights(data.insights);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to load insights");
     } finally {
       setLoadingInsights(false);
     }
+  }
+
+  async function loadStories(card_id: string) {
+    setLoadingStories(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-stories", { body: { card_id } });
+      if (error) throw error;
+      if (data?.error) return;
+      setStories(data.stories);
+    } catch { /* silent */ }
+    finally { setLoadingStories(false); }
   }
 
   if (loading) return <div className="container py-16 text-muted-foreground">Loading…</div>;
@@ -193,6 +206,31 @@ export default function CardDetail() {
                 ) : null}
               </>
             )}
+          </div>
+
+          {/* Hall of Hacks */}
+          <div className="rounded-xl border bg-gradient-to-br from-accent/10 via-background to-primary/5 p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-accent/90 flex items-center justify-center">
+                <Flame className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Hall of Hacks</h2>
+                <p className="text-xs text-muted-foreground">Anonymized, AI-paraphrased community wisdom · no real users named</p>
+              </div>
+            </div>
+            {loadingStories && <p className="text-sm text-muted-foreground">Cooking up some stories…</p>}
+            {stories?.stories?.length ? (
+              <div className="grid sm:grid-cols-3 gap-3">
+                {stories.stories.map((s, i) => (
+                  <div key={i} className="rounded-lg border bg-background p-4">
+                    <Badge variant="outline" className="text-[10px] mb-2 capitalize">{s.vibe}</Badge>
+                    <div className="font-semibold text-sm">{s.title}</div>
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{s.story}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
