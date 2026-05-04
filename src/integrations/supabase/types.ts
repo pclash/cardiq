@@ -43,6 +43,27 @@ export type Database = {
           },
         ]
       }
+      card_stories: {
+        Row: {
+          card_id: string
+          generated_at: string
+          id: string
+          stories: Json
+        }
+        Insert: {
+          card_id: string
+          generated_at?: string
+          id?: string
+          stories: Json
+        }
+        Update: {
+          card_id?: string
+          generated_at?: string
+          id?: string
+          stories?: Json
+        }
+        Relationships: []
+      }
       cards: {
         Row: {
           annual_fee: number
