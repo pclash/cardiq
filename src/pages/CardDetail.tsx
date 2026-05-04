@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import type { Card as CardT, Insights } from "@/lib/types";
+import type { Card as CardT, Insights, Stories } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CardThumb from "@/components/CardThumb";
-import { ArrowLeft, ExternalLink, Sparkles, CheckCircle2, XCircle, AlertTriangle, Users } from "lucide-react";
+import { ArrowLeft, ExternalLink, Sparkles, CheckCircle2, XCircle, AlertTriangle, Users, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CardDetail() {
