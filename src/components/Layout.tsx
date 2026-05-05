@@ -21,7 +21,7 @@ export default function Layout() {
             <div className="h-8 w-8 rounded-lg gradient-card flex items-center justify-center shadow-card">
               <Sparkles className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">Swipe<span className="text-primary">Sutra</span></span>
+            <span className="font-bold text-lg tracking-tight">Card<span className="text-primary">IQ</span></span>
           </Link>
           <nav className="flex items-center gap-6">
             {navLink("/", "Browse")}
@@ -33,14 +33,14 @@ export default function Layout() {
       <main className="flex-1"><Outlet /></main>
       <footer className="border-t mt-12 bg-secondary/30">
         <div className="container py-8 text-sm text-muted-foreground space-y-2">
-          <p className="font-semibold text-foreground">SwipeSutra · the art of using cards in India</p>
+          <p className="font-semibold text-foreground">CardIQ · smart intelligence on Indian credit cards</p>
           <p>
-            SwipeSutra is an independent, non-affiliated guide. Card details and AI-generated insights
+            CardIQ is an independent, non-affiliated guide. Card details and AI-generated insights
             are for guidance only and may be outdated. Always verify fees, benefits and eligibility on
             the official issuing bank's website before applying.
           </p>
           <p>No affiliate links · No personal data collected · Not financial advice.</p>
-          <p className="pt-2">© {new Date().getFullYear()} SwipeSutra</p>
+          <p className="pt-2">© {new Date().getFullYear()} CardIQ</p>
         </div>
       </footer>
     </div>

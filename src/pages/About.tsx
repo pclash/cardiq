@@ -3,7 +3,7 @@ import { Sparkles, ShieldCheck, FileText, Users } from "lucide-react";
 export default function About() {
   return (
     <section className="container py-12 max-w-3xl">
-      <h1 className="text-3xl md:text-4xl font-bold">About SwipeSutra</h1>
+      <h1 className="text-3xl md:text-4xl font-bold">About CardIQ</h1>
       <p className="text-muted-foreground mt-3 text-lg">
         Every Indian credit card — from your first lifetime-free card to ultra-luxury metal — decoded
         without the marketing fluff. Independent, ad-free, no affiliate links.
@@ -30,7 +30,7 @@ export default function About() {
 
       <h2 className="text-xl font-semibold mt-12">Disclaimer</h2>
       <p className="text-sm text-muted-foreground mt-2">
-        SwipeSutra is not a regulated financial advisor and does not earn commission on any application.
+        CardIQ is not a regulated financial advisor and does not earn commission on any application.
         Information is provided "as is" and may be outdated. Nothing on this site is financial advice.
         Card visuals are generic mockups — all bank trademarks belong to their respective owners.
       </p>
