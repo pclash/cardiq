@@ -8,6 +8,7 @@ import Browse from "./pages/Browse";
 import CardDetail from "./pages/CardDetail";
 import Compare from "./pages/Compare";
 import About from "./pages/About";
+import AdminSeed from "./pages/AdminSeed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/card/:slug" element={<CardDetail />} />
             <Route path="/compare" element={<Compare />} />
             <Route path="/about" element={<About />} />
+            <Route path="/admin/seed" element={<AdminSeed />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
