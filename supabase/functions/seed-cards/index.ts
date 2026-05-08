@@ -63,25 +63,28 @@ Rules:
 - Keep arrays concise.
 - Return [] if no cards found.`;
 
-async function geminiExtract(markdown: string, bankHint: string): Promise<any[]> {
-  const prompt = `${EXTRACTION_PROMPT}\n\nBank context: ${bankHint}\n\nWEBPAGE MARKDOWN:\n${markdown.slice(0, 60000)}`;
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
-      }),
+async function aiExtract(markdown: string, bankHint: string): Promise<any[]> {
+  const prompt = `${EXTRACTION_PROMPT}\n\nBank context: ${bankHint}\n\nWrap the array under key "cards" so the response is a JSON object: { "cards": [...] }.\n\nWEBPAGE MARKDOWN:\n${markdown.slice(0, 60000)}`;
+  const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+    }),
+  });
   const data = await r.json();
-  if (!r.ok) throw new Error(`Gemini ${r.status}: ${JSON.stringify(data).slice(0, 300)}`);
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "[]";
+  if (!r.ok) throw new Error(`AI ${r.status}: ${JSON.stringify(data).slice(0, 300)}`);
+  const text = data.choices?.[0]?.message?.content ?? "{}";
   try {
     const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed)) return parsed;
+    if (Array.isArray(parsed.cards)) return parsed.cards;
+    return [];
   } catch {
     return [];
   }
