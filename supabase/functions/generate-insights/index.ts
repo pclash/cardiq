@@ -52,8 +52,8 @@ Deno.serve(async (req) => {
       .from("cards").select("slug,name,bank,use_cases,best_for")
       .neq("id", card_id).limit(60);
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const systemPrompt = `You are an Indian credit card expert. Output strictly factual, neutral, AI-synthesized analysis as JSON only.
 Rules:
@@ -63,31 +63,35 @@ Rules:
 - No hype, no marketing tone, helpful and clear.
 - Output ONLY valid JSON matching the schema. No markdown, no commentary.`;
 
-    const userPrompt = `CARD:\n${JSON.stringify(card, null, 2)}\n\nPEER CARDS (pick alternatives only from these slugs):\n${JSON.stringify(peers, null, 2)}\n\nReturn JSON:\n{\n  "best_use_cases": [{"title": string, "detail": string}],   // 4-6 items\n  "avoid_for": [{"title": string, "detail": string}],        // 3-5 items\n  "excluded_categories": [string],\n  "community_sentiment": string,                              // 2-3 sentences, neutral, no quotes/usernames\n  "alternatives": [{"slug": string, "name": string, "why": string}] // 3 from peer list\n}`;
+    const userPrompt = `CARD:\n${JSON.stringify(card, null, 2)}\n\nPEER CARDS (pick alternatives only from these slugs):\n${JSON.stringify(peers, null, 2)}\n\nReturn JSON:\n{\n  "best_use_cases": [{"title": string, "detail": string}],\n  "avoid_for": [{"title": string, "detail": string}],\n  "excluded_categories": [string],\n  "community_sentiment": string,\n  "alternatives": [{"slug": string, "name": string, "why": string}]\n}`;
 
-    const aiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.4 },
-        }),
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
 
     if (!aiRes.ok) {
       const t = await aiRes.text();
-      console.error("Gemini error", aiRes.status, t);
-      return new Response(JSON.stringify({ error: `Gemini API error (${aiRes.status})` }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error("AI gateway error", aiRes.status, t);
+      const status = aiRes.status === 429 || aiRes.status === 402 ? aiRes.status : 500;
+      return new Response(JSON.stringify({ error: `AI gateway error (${aiRes.status})` }), {
+        status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const aiJson = await aiRes.json();
-    const content = aiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    const content = aiJson.choices?.[0]?.message?.content ?? "{}";
     let insights;
     try { insights = JSON.parse(content); }
     catch { insights = { error: "Failed to parse AI response", raw: content }; }
