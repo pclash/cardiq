@@ -46,8 +46,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const systemPrompt = `You are a writer creating short, fun, anonymized credit-card "hack" anecdotes for Indian audiences.
 STRICT RULES:
@@ -57,31 +57,35 @@ STRICT RULES:
 - Tone: witty, punchy, 2-4 sentences each. No hype, no fake numbers. Use "a user", "one cardholder", "a Bengaluru techie" style anonymization.
 - Output ONLY valid JSON. No markdown.`;
 
-    const userPrompt = `CARD: ${card.name} (${card.bank})\nUse cases: ${card.use_cases.join(", ")}\nKey benefits: ${card.key_benefits.join(" | ")}\n\nReturn JSON:\n{\n  "stories": [\n    { "title": string, "story": string, "vibe": "smart" | "wild" | "wholesome" | "savage" }\n  ]  // exactly 3 anonymized anecdotes\n}`;
+    const userPrompt = `CARD: ${card.name} (${card.bank})\nUse cases: ${(card.use_cases || []).join(", ")}\nKey benefits: ${(card.key_benefits || []).join(" | ")}\n\nReturn JSON:\n{\n  "stories": [\n    { "title": string, "story": string, "vibe": "smart" | "wild" | "wholesome" | "savage" }\n  ]\n}`;
 
-    const aiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.9 },
-        }),
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
 
     if (!aiRes.ok) {
       const t = await aiRes.text();
-      console.error("Gemini error", aiRes.status, t);
-      return new Response(JSON.stringify({ error: `Gemini API error (${aiRes.status})` }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error("AI gateway error", aiRes.status, t);
+      const status = aiRes.status === 429 || aiRes.status === 402 ? aiRes.status : 500;
+      return new Response(JSON.stringify({ error: `AI gateway error (${aiRes.status})` }), {
+        status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const aiJson = await aiRes.json();
-    const content = aiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    const content = aiJson.choices?.[0]?.message?.content ?? "{}";
     let stories;
     try { stories = JSON.parse(content); }
     catch { stories = { stories: [] }; }
