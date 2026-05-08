@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 const CACHE_DAYS = 30;
-const GEMINI_MODEL = "gemini-2.5-flash";
+const AI_MODEL = "google/gemini-3-flash-preview";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
