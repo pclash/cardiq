@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
         log.push(`Scraping ${url}`);
         const md = await firecrawlScrape(url);
         log.push(`  → ${md.length} chars`);
-        const cards = await geminiExtract(md, bank);
+        const cards = await aiExtract(md, bank);
         log.push(`  → extracted ${cards.length} cards`);
         allCards.push(...cards);
       } catch (e) {
