@@ -8,9 +8,10 @@ const corsHeaders = {
 };
 
 const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const AI_MODEL = "google/gemini-3-flash-preview";
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
@@ -62,25 +63,28 @@ Rules:
 - Keep arrays concise.
 - Return [] if no cards found.`;
 
-async function geminiExtract(markdown: string, bankHint: string): Promise<any[]> {
-  const prompt = `${EXTRACTION_PROMPT}\n\nBank context: ${bankHint}\n\nWEBPAGE MARKDOWN:\n${markdown.slice(0, 60000)}`;
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
-      }),
+async function aiExtract(markdown: string, bankHint: string): Promise<any[]> {
+  const prompt = `${EXTRACTION_PROMPT}\n\nBank context: ${bankHint}\n\nWrap the array under key "cards" so the response is a JSON object: { "cards": [...] }.\n\nWEBPAGE MARKDOWN:\n${markdown.slice(0, 60000)}`;
+  const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+    }),
+  });
   const data = await r.json();
-  if (!r.ok) throw new Error(`Gemini ${r.status}: ${JSON.stringify(data).slice(0, 300)}`);
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "[]";
+  if (!r.ok) throw new Error(`AI ${r.status}: ${JSON.stringify(data).slice(0, 300)}`);
+  const text = data.choices?.[0]?.message?.content ?? "{}";
   try {
     const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed)) return parsed;
+    if (Array.isArray(parsed.cards)) return parsed.cards;
+    return [];
   } catch {
     return [];
   }
@@ -91,7 +95,7 @@ Deno.serve(async (req) => {
 
   try {
     if (!FIRECRAWL_API_KEY) throw new Error("FIRECRAWL_API_KEY missing");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
     const { bank, urls } = await req.json();
     if (!bank || !Array.isArray(urls) || urls.length === 0) {
@@ -110,7 +114,7 @@ Deno.serve(async (req) => {
         log.push(`Scraping ${url}`);
         const md = await firecrawlScrape(url);
         log.push(`  → ${md.length} chars`);
-        const cards = await geminiExtract(md, bank);
+        const cards = await aiExtract(md, bank);
         log.push(`  → extracted ${cards.length} cards`);
         allCards.push(...cards);
       } catch (e) {
