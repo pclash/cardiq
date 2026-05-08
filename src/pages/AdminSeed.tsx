@@ -68,9 +68,32 @@ export default function AdminSeed() {
         </p>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
         <Button onClick={runAll} disabled={running}>
           {running ? `Running… ${active ?? ""}` : "Seed ALL banks"}
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={running}
+          onClick={async () => {
+            setRunning(true);
+            setActive("Pre-warming insights + stories");
+            const { data, error } = await supabase.functions.invoke("prewarm-cache", { body: {} });
+            const r: RunResult = error
+              ? { bank: "Pre-warm cache", ok: false, error: error.message }
+              : {
+                  bank: "Pre-warm cache",
+                  ok: !!data?.ok,
+                  upserted: (data?.insightsDone ?? 0) + (data?.storiesDone ?? 0),
+                  log: data?.log,
+                  error: data?.error,
+                };
+            setResults((prev) => [r, ...prev]);
+            setActive(null);
+            setRunning(false);
+          }}
+        >
+          Pre-warm insights + stories (all cards)
         </Button>
       </div>
 
