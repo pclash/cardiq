@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
   try {
     if (!FIRECRAWL_API_KEY) throw new Error("FIRECRAWL_API_KEY missing");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
     const { bank, urls } = await req.json();
     if (!bank || !Array.isArray(urls) || urls.length === 0) {
