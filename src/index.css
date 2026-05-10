@@ -1,52 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @layer base {
   :root {
     --background: 240 20% 99%;
     --foreground: 230 25% 12%;
-
     --card: 0 0% 100%;
     --card-foreground: 230 25% 12%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 230 25% 12%;
-
     --primary: 200 90% 32%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 195 85% 45%;
-
     --secondary: 240 20% 96%;
     --secondary-foreground: 230 25% 18%;
-
     --muted: 240 15% 95%;
     --muted-foreground: 230 12% 42%;
-
     --accent: 35 95% 55%;
     --accent-foreground: 230 30% 12%;
-
     --success: 150 60% 38%;
     --success-foreground: 0 0% 100%;
-
     --warning: 35 95% 50%;
     --warning-foreground: 0 0% 100%;
-
     --destructive: 0 75% 52%;
     --destructive-foreground: 0 0% 100%;
-
     --border: 230 15% 90%;
     --input: 230 15% 90%;
     --ring: 200 90% 32%;
-
     --radius: 0.75rem;
-
     --gradient-hero: linear-gradient(135deg, hsl(210 80% 22%) 0%, hsl(200 85% 32%) 50%, hsl(190 70% 40%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(210 75% 28%) 0%, hsl(195 75% 38%) 100%);
     --shadow-card: 0 4px 16px -4px hsl(210 50% 20% / 0.08);
     --shadow-elevated: 0 10px 40px -10px hsl(210 50% 20% / 0.18);
   }
-
   .dark {
     --background: 230 25% 8%;
     --foreground: 240 15% 96%;
@@ -67,16 +53,24 @@
     --ring: 195 85% 55%;
   }
 }
-
 @layer base {
   * { @apply border-border; }
   body { @apply bg-background text-foreground antialiased; font-feature-settings: "cv11", "ss01"; }
   h1,h2,h3,h4 { @apply font-semibold tracking-tight; }
 }
-
 @layer utilities {
   .gradient-hero { background: var(--gradient-hero); }
   .gradient-card { background: var(--gradient-card); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-elevated { box-shadow: var(--shadow-elevated); }
+}
+
+/* Hide Lovable badge */
+#lovable-badge,
+a[href*="lovable.dev"],
+a[href*="lovable.app"][target="_blank"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
