@@ -44,7 +44,10 @@ export default function Browse() {
         || c.use_cases.some(u => u.toLowerCase().includes(t)) || (c.best_for ?? "").toLowerCase().includes(t));
     }
     if (banks.length) r = r.filter(c => banks.includes(c.bank));
-    if (useCases.length) r = r.filter(c => useCases.some(u => c.use_cases.includes(u)));
+    if (useCases.length) {
+      const sel = useCases.map(u => u.toLowerCase());
+      r = r.filter(c => c.use_cases.some(u => sel.includes(u.toLowerCase())));
+    }
     if (income) {
       const band = INCOME_BANDS.find(b => b.label === income);
       if (band) r = r.filter(c => band.test(c.eligibility?.min_income));
