@@ -24,7 +24,6 @@ export default function Layout() {
             <span className="font-bold text-lg tracking-tight">Card<span className="text-primary">IQ</span></span>
           </Link>
           <nav className="flex items-center gap-6">
-            {navLink("/", "Browse")}
             {navLink("/compare", "Compare")}
             {navLink("/about", "About")}
           </nav>
